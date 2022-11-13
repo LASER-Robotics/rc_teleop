@@ -33,10 +33,11 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Int32.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <string>
 
-namespace sailboat_telep
+namespace rc_teleop
 {
 
 class Teleop
@@ -44,10 +45,8 @@ class Teleop
 private:
 
   ros::NodeHandle node_handle_;
-  ros::Subscriber joy_subscriber_;
-  ros::Publisher rudder_joint_publisher_;
-  ros::Publisher sail_joint_publisher_;
-  ros::Publisher motor_joint_publisher_;
+  ros::Subscriber joy_raw_subscriber_;
+  ros::Publisher joy_publisher_;
 
   struct Axis
   {
@@ -71,6 +70,8 @@ private:
 
   struct
   {
+    Axis roll;
+    Axis pitch;
     Axis x;
     Axis y;
     Axis z;
@@ -93,36 +94,31 @@ public:
   {
     ros::NodeHandle private_nh("~");
 
+    private_nh.param<int>("roll_axis", axes_.x.axis, 10);
+    private_nh.param<int>("pitch_axis", axes_.x.axis, 10);
     private_nh.param<int>("x_axis", axes_.x.axis, 5);
     private_nh.param<int>("y_axis", axes_.y.axis, 4);
     private_nh.param<int>("z_axis", axes_.z.axis, 2);
-    private_nh.param<int>("thrust_axis", axes_.thrust.axis, -3);
+    private_nh.param<int>("thrust_axis", axes_.thrust.axis, 3);
     private_nh.param<int>("yaw_axis", axes_.yaw.axis, 1);
 
-    private_nh.param<double>("yaw_velocity_max", axes_.yaw.factor, 90.0);
+    private_nh.param<double>("yaw_velocity_max", axes_.yaw.factor, 1.0);
 
     private_nh.param<int>("slow_button", buttons_.slow.button, 4);
-    private_nh.param<int>("go_button", buttons_.go.button, 1);
+    private_nh.param<int>("go_button", buttons_.go.button, 7);
     private_nh.param<int>("stop_button", buttons_.stop.button, 2);
     private_nh.param<int>("interrupt_button", buttons_.interrupt.button, 3);
     private_nh.param<double>("slow_factor", slow_factor_, 0.2);
 
-    private_nh.param<double>("pitch_max", axes_.x.factor, 10.0);
-    private_nh.param<double>("roll_max", axes_.y.factor, 60.0);
-    private_nh.param<double>("thrust_max", axes_.thrust.factor, 90.0);
+    private_nh.param<double>("pitch_max", axes_.x.factor, 1.0);
+    private_nh.param<double>("roll_max", axes_.y.factor, 1.0);
+    private_nh.param<double>("thrust_max", axes_.thrust.factor, 1.0);
     private_nh.param<double>("thrust_offset", axes_.thrust.offset, 0.0);
 
-    joy_subscriber_ = node_handle_.subscribe<sensor_msgs::Joy>("joy", 1,
-                                                               boost::bind(&Teleop::joyAttitudeCallback, this, _1));
+    joy_raw_subscriber_ = node_handle_.subscribe<sensor_msgs::Joy>("joy_raw", 1,
+                                                               boost::bind(&Teleop::joyRemapRCCallback, this, _1));
 
-    rudder_joint_publisher_ = node_handle_.advertise<std_msgs::Float64>(
-        "/sailboat/rudder_joint_position_controller/command", 10);
-
-    sail_joint_publisher_ = node_handle_.advertise<std_msgs::Float64>(
-        "/sailboat/sail_joint_position_controller/command", 10);
-
-    motor_joint_publisher_ = node_handle_.advertise<std_msgs::Float32>(
-        "/sailboat/thrusters/center_thrust_cmd", 10);
+    joy_publisher_ = node_handle_.advertise<sensor_msgs::Joy>("joy", 1);
   }
 
   ~Teleop()
@@ -130,29 +126,35 @@ public:
     stop();
   }
 
-  void joyAttitudeCallback(const sensor_msgs::JoyConstPtr &joy)
+  void joyRemapRCCallback(const sensor_msgs::JoyConstPtr &joy)
   {
-    std_msgs::Float64 rudder_cmd;
-    std_msgs::Float64 sail_cmd;
-    std_msgs::Float32 motor_cmd;
-    
-    double rudder, sail;
+    sensor_msgs::Joy joy_;
+    std_msgs::Float32 axes_ [6] ;
+    std_msgs::Int32 buttons_ [12] ;
 
-    rudder_cmd.data = -getAxis(joy, axes_.y) * M_PI/180.0;
-    sail_cmd.data = getAxis(joy, axes_.thrust) * M_PI/180.0;
-    motor_cmd.data = getAxis(joy, axes_.x);
+    joy_.header = joy->header;
+    joy_.axes = joy->axes;
 
-    rudder_joint_publisher_.publish(rudder_cmd);
-    sail_joint_publisher_.publish(sail_cmd);
-    motor_joint_publisher_.publish(motor_cmd);
+    joy_.axes[0] = joy->axes[3];
+    joy_.axes[1] = -joy->axes[1];
+    joy_.axes[2] = joy->axes[0];
+    joy_.axes[3] = joy->axes[2];
+    joy_.axes[4] = joy->axes[4];
+    joy_.axes[5] = joy->axes[5];
+
+    joy_.buttons = joy->buttons;
+    joy_.buttons[6] = joy->buttons[3];
+    joy_.buttons[3] = joy->buttons[6];
+
+    joy_publisher_.publish(joy_);
   }
 
-  double getAxis(const sensor_msgs::JoyConstPtr &joy, const Axis &axis)
+double getAxis(const sensor_msgs::JoyConstPtr &joy, const Axis &axis)
   {
     if (axis.axis == 0 || std::abs(axis.axis) > joy->axes.size())
     {
       ROS_ERROR_STREAM("Axis " << axis.axis << " out of range, joy has " << joy->axes.size() << " axes");
-      return 0;
+      return 0.0;
     }
 
     double output = std::abs(axis.axis) / axis.axis * joy->axes[std::abs(axis.axis) - 1] * axis.factor + axis.offset;
@@ -173,22 +175,20 @@ public:
 
   void stop()
   {
-    if (rudder_joint_publisher_.getNumSubscribers() > 0 || sail_joint_publisher_.getNumSubscribers() > 0 || motor_joint_publisher_.getNumSubscribers() > 0) 
+    if (joy_publisher_.getNumSubscribers() > 0) 
     {
-      rudder_joint_publisher_.publish(std_msgs::Float64());
-      sail_joint_publisher_.publish(std_msgs::Float64());
-      motor_joint_publisher_.publish(std_msgs::Float32());
+      joy_publisher_.publish(sensor_msgs::Joy());
     }
   }
 };
 
-} // namespace hector_quadrotor
+} // namespace uav
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "sailboat_teleop");
+  ros::init(argc, argv, "rc_teleop");
 
-  sailboat_telep::Teleop teleop;
+  rc_teleop::Teleop teleop;
   ros::spin();
 
   return 0;

@@ -13,7 +13,7 @@
       <remap from="joy" to="joy_raw" />
     </node>
 
-  <node name="rc_teleop" pkg="rc_teleop" type="rc_teleop_txs" output="screen">
+  <node name="rc_teleop" pkg="rc_teleop" type="rc_teleop" output="screen">
     <rosparam subst_value="true">
       roll_axis: 1
       pitch_axis: 2

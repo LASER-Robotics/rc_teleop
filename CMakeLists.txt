@@ -19,21 +19,11 @@ catkin_package(
 )
 
 add_executable(rc_teleop src/rc_teleop.cpp)
-add_executable(rc_teleop_txs src/rc_teleop_txs.cpp)
 
 target_link_libraries(rc_teleop ${catkin_LIBRARIES})
 add_dependencies(rc_teleop std_msgs ${catkin_EXPORTED_TARGETS})
 
 install(TARGETS rc_teleop
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-target_link_libraries(rc_teleop_txs ${catkin_LIBRARIES})
-add_dependencies(rc_teleop_txs std_msgs ${catkin_EXPORTED_TARGETS})
-
-install(TARGETS rc_teleop_txs
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

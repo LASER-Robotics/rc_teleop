@@ -37,10 +37,10 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <string>
 
-namespace rc_teleop
+namespace rc_teleop_txs
 {
 
-class Teleop
+class TeleopTxs
 {
 private:
 
@@ -90,19 +90,26 @@ private:
   double slow_factor_;
 
 public:
-  Teleop()
+  TeleopTxs()
   {
     ros::NodeHandle private_nh("~");
 
-    private_nh.param<int>("roll_axis", axes_.x.axis, 10);
-    private_nh.param<int>("pitch_axis", axes_.x.axis, 10);
-    private_nh.param<int>("x_axis", axes_.x.axis, 5);
-    private_nh.param<int>("y_axis", axes_.y.axis, 4);
-    private_nh.param<int>("z_axis", axes_.z.axis, 2);
+    private_nh.param<int>("roll_axis", axes_.roll.axis, 4);
+    private_nh.param<int>("pitch_axis", axes_.pitch.axis, 2);
     private_nh.param<int>("thrust_axis", axes_.thrust.axis, 3);
     private_nh.param<int>("yaw_axis", axes_.yaw.axis, 1);
 
-    private_nh.param<double>("yaw_velocity_max", axes_.yaw.factor, 1.0);
+    private_nh.param<double>("yaw_max", axes_.yaw.factor, 1.0);
+    private_nh.param<double>("yaw_offset", axes_.yaw.offset, 0.0);
+
+    private_nh.param<double>("roll_max", axes_.roll.factor, 1.0);
+    private_nh.param<double>("roll_offset", axes_.roll.offset, 0.0);
+
+    private_nh.param<double>("pitch_max", axes_.pitch.factor, 1.0);
+    private_nh.param<double>("pitch_offset", axes_.pitch.offset, 0.0);
+
+    private_nh.param<double>("thrust_max", axes_.thrust.factor, 1.0);
+    private_nh.param<double>("thrust_offset", axes_.thrust.offset, 0.0);
 
     private_nh.param<int>("slow_button", buttons_.slow.button, 4);
     private_nh.param<int>("go_button", buttons_.go.button, 7);
@@ -110,18 +117,13 @@ public:
     private_nh.param<int>("interrupt_button", buttons_.interrupt.button, 3);
     private_nh.param<double>("slow_factor", slow_factor_, 0.2);
 
-    private_nh.param<double>("pitch_max", axes_.x.factor, 1.0);
-    private_nh.param<double>("roll_max", axes_.y.factor, 1.0);
-    private_nh.param<double>("thrust_max", axes_.thrust.factor, 1.0);
-    private_nh.param<double>("thrust_offset", axes_.thrust.offset, 0.0);
-
     joy_raw_subscriber_ = node_handle_.subscribe<sensor_msgs::Joy>("joy_raw", 1,
-                                                               boost::bind(&Teleop::joyRemapRCCallback, this, _1));
+                                                               boost::bind(&TeleopTxs::joyRemapRCCallback, this, _1));
 
     joy_publisher_ = node_handle_.advertise<sensor_msgs::Joy>("joy", 1);
   }
 
-  ~Teleop()
+  ~TeleopTxs()
   {
     stop();
   }
@@ -129,27 +131,28 @@ public:
   void joyRemapRCCallback(const sensor_msgs::JoyConstPtr &joy)
   {
     sensor_msgs::Joy joy_;
-    std_msgs::Float32 axes_ [6] ;
-    std_msgs::Int32 buttons_ [12] ;
 
     joy_.header = joy->header;
     joy_.axes = joy->axes;
 
-    joy_.axes[0] = joy->axes[3];
-    joy_.axes[1] = -joy->axes[1];
-    joy_.axes[2] = joy->axes[0];
-    joy_.axes[3] = joy->axes[2];
-    joy_.axes[4] = joy->axes[4];
-    joy_.axes[5] = joy->axes[5];
+    // joy_.axes[0] = joy->axes[3];
+    // joy_.axes[1] = -joy->axes[1];
+    // joy_.axes[2] = joy->axes[2];
+    // joy_.axes[3] = joy->axes[0];
+
+    joy_.axes[0] = getAxis(joy, axes_.yaw);
+    joy_.axes[1] = getAxis(joy, axes_.pitch);
+    joy_.axes[2] = getAxis(joy, axes_.thrust);
+    joy_.axes[3] = getAxis(joy, axes_.roll);
 
     joy_.buttons = joy->buttons;
-    joy_.buttons[6] = joy->buttons[3];
-    joy_.buttons[3] = joy->buttons[6];
+    joy_.buttons[6] = getButton(joy, buttons_.go);
+    joy_.buttons[buttons_.go.button-1] = joy->buttons[6];
 
     joy_publisher_.publish(joy_);
   }
 
-double getAxis(const sensor_msgs::JoyConstPtr &joy, const Axis &axis)
+float getAxis(const sensor_msgs::JoyConstPtr &joy, const Axis &axis)
   {
     if (axis.axis == 0 || std::abs(axis.axis) > joy->axes.size())
     {
@@ -157,7 +160,7 @@ double getAxis(const sensor_msgs::JoyConstPtr &joy, const Axis &axis)
       return 0.0;
     }
 
-    double output = std::abs(axis.axis) / axis.axis * joy->axes[std::abs(axis.axis) - 1] * axis.factor + axis.offset;
+    float output = std::abs(axis.axis) / axis.axis * joy->axes[std::abs(axis.axis) - 1] * axis.factor + axis.offset;
 
     return output;
   }
@@ -186,9 +189,9 @@ double getAxis(const sensor_msgs::JoyConstPtr &joy, const Axis &axis)
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "rc_teleop");
+  ros::init(argc, argv, "rc_teleop_txs");
 
-  rc_teleop::Teleop teleop;
+  rc_teleop_txs::TeleopTxs teleop;
   ros::spin();
 
   return 0;
