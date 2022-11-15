@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   tf2_geometry_msgs
   std_msgs
+  mavros_msgs
   visualization_msgs)
 include_directories(include ${catkin_INCLUDE_DIRS})
 
@@ -24,6 +25,17 @@ target_link_libraries(rc_teleop ${catkin_LIBRARIES})
 add_dependencies(rc_teleop std_msgs ${catkin_EXPORTED_TARGETS})
 
 install(TARGETS rc_teleop
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+add_executable(rc_teleop_direct src/rc_teleop_direct.cpp)
+
+target_link_libraries(rc_teleop_direct ${catkin_LIBRARIES})
+add_dependencies(rc_teleop_direct std_msgs mavros_msgs ${catkin_EXPORTED_TARGETS})
+
+install(TARGETS rc_teleop_direct
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
