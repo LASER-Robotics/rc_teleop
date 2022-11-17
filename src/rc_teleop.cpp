@@ -142,7 +142,7 @@ public:
 
     joy_.axes[0] = getAxis(joy, axes_.yaw);
     joy_.axes[1] = getAxis(joy, axes_.pitch);
-    joy_.axes[2] = getAxis(joy, axes_.thrust);
+    joy_.axes[4] = getAxis(joy, axes_.thrust);
     joy_.axes[3] = getAxis(joy, axes_.roll);
 
     joy_.buttons = joy->buttons;

@@ -30,12 +30,12 @@ install(TARGETS rc_teleop
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-add_executable(rc_teleop_direct src/rc_teleop_direct.cpp)
+add_executable(rc_teleop_to_rcin src/rc_teleop_to_rcin.cpp)
 
-target_link_libraries(rc_teleop_direct ${catkin_LIBRARIES})
-add_dependencies(rc_teleop_direct std_msgs mavros_msgs ${catkin_EXPORTED_TARGETS})
+target_link_libraries(rc_teleop_to_rcin ${catkin_LIBRARIES})
+add_dependencies(rc_teleop_to_rcin std_msgs mavros_msgs ${catkin_EXPORTED_TARGETS})
 
-install(TARGETS rc_teleop_direct
+install(TARGETS rc_teleop_to_rcin
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

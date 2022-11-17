@@ -30,8 +30,9 @@ windows:
       panes:
         - waitForSimulation; roslaunch mrs_uav_general automatic_start.launch
         - 'waitForControl;
-          rosservice call /$UAV_NAME/mavros/set_mode "custom_mode: ALTCTL"'
-
+          rosservice call /$UAV_NAME/mavros/cmd/arming 1;
+          sleep 2;
+          rosservice call /$UAV_NAME/mavros/set_mode 0 offboard'
   - rviz:
       layout: tiled
       panes:
@@ -40,7 +41,7 @@ windows:
   - easy_control:
       layout: tiled
       panes:
-        - waitForControl; waitForControl; roslaunch rc_teleop rc_teleop_txs.launch
+        - waitForControl; waitForControl; roslaunch rc_teleop rc_teleop_logitec.launch
         - waitForControl; waitForControl; roslaunch mrs_rviz_plugins rviz_interface.launch
   - layout:
       layout: tiled
