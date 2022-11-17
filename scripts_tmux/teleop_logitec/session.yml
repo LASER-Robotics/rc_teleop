@@ -25,20 +25,25 @@ windows:
       layout: tiled
       panes:
         - waitForOdometry; roslaunch mrs_uav_general core.launch
-  - easy_control:
-      layout: tiled
-      panes:
-        - waitForControl; roslaunch rc_teleop rc_teleop_logitec_to_rcin.launch
-        - waitForControl; sleep 2; rosservice call /$UAV_NAME/control_manager/use_joystick "{}" 
   - takeoff:
       layout: tiled
       panes:
         - waitForSimulation; roslaunch mrs_uav_general automatic_start.launch
-        - 'waitForControl; sleep 4;
-          rosservice call /$UAV_NAME/mavros/set_mode "custom_mode: STABILIZED";
-          sleep 1;
-          rosservice call /$UAV_NAME/mavros/cmd/arming 1'
+        - 'waitForControl;
+          rosservice call /$UAV_NAME/mavros/cmd/arming 1;
+          sleep 2;
+          rosservice call /$UAV_NAME/mavros/set_mode 0 offboard'
+  - rviz:
+      layout: tiled
+      panes:
+        - waitForControl; roslaunch mrs_uav_testing rviz_random_simulation.launch
+        - waitForControl; roslaunch mrs_rviz_plugins load_robot.launch
+  - easy_control:
+      layout: tiled
+      panes:
+        - waitForControl; waitForControl; roslaunch rc_teleop rc_teleop_logitec.launch
+        - waitForControl; waitForControl; roslaunch mrs_rviz_plugins rviz_interface.launch
   - layout:
       layout: tiled
       panes:
-        - sleep 3; ~/.i3/layout_manager.sh ./layout.json
+        - waitForControl; sleep 3; ~/.i3/layout_manager.sh ./layout.json
