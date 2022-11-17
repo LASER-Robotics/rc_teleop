@@ -1,0 +1,42 @@
+<launch>
+
+  <!-- args corresponding to environment variables -->
+  <arg name="UAV_NAME" default="$(optenv UAV_NAME)" />
+
+  <arg name="js" default="js0" />
+
+  <!-- UAV namespace -->
+  <group ns="$(arg UAV_NAME)">
+
+    <node name="joystick" pkg="joy" type="joy_node" output="screen">
+      <param name="dev" type="string" value="/dev/input/$(arg js)" />
+      <remap from="joy" to="joy_raw" />
+    </node>
+
+  <node name="rc_teleop_flysky" pkg="rc_teleop" type="rc_teleop_to_rcin" output="screen">
+    <rosparam subst_value="true">
+      roll_axis: 3
+      pitch_axis: 2
+      thrust_axis: 1
+      yaw_axis: 4
+
+      roll_max: -500.0
+      roll_offset: 1500.0
+
+      pitch_max: -500.0
+      pitch_offset: 1500.0
+
+      thrust_max: -500.0
+      thrust_offset: 1500.0
+
+      yaw_max: -500.0
+      yaw_offset: 1500.0
+
+      go_button: 4
+    </rosparam>
+
+  </node>
+
+  </group>
+
+</launch>

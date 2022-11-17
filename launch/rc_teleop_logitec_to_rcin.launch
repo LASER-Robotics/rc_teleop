@@ -13,12 +13,12 @@
       <remap from="joy" to="joy_raw" />
     </node>
 
-  <node name="rc_teleop_flysky" pkg="rc_teleop" type="rc_teleop_direct" output="screen">
+  <node name="rc_teleop_logitec_to_rcin" pkg="rc_teleop" type="rc_teleop_to_rcin" output="screen">
     <rosparam subst_value="true">
       roll_axis: 3
       pitch_axis: 2
-      thrust_axis: 1
-      yaw_axis: 4
+      thrust_axis: 4
+      yaw_axis: 1
 
       roll_max: -500.0
       roll_offset: 1500.0
@@ -32,7 +32,7 @@
       yaw_max: -500.0
       yaw_offset: 1500.0
 
-      go_button: 4
+      go_button: 7
     </rosparam>
 
   </node>
