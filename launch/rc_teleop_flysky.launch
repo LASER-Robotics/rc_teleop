@@ -26,8 +26,8 @@
       pitch_max: -1.0
       pitch_offset: 0.0
 
-      thrust_max: 1.0
-      thrust_offset: 0.0
+      thrust_max: -0.5
+      thrust_offset: 0.5
 
       yaw_max: 1.0
       yaw_offset: 0.0
