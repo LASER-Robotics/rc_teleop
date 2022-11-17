@@ -20,17 +20,17 @@
       thrust_axis: 3
       yaw_axis: 4
 
-      roll_max: -2.0
-      roll_offset: -1.0
+      roll_max: 1.0
+      roll_offset: 0.0
 
-      pitch_max: -2.0
-      pitch_offset: -1.0
+      pitch_max: -1.0
+      pitch_offset: 0.0
 
-      thrust_max: -2.0
-      thrust_offset: -1.0
+      thrust_max: -1.0
+      thrust_offset: 0.0
 
-      yaw_max: 2.0
-      yaw_offset: 1.0
+      yaw_max: 1.0
+      yaw_offset: 0.0
 
       go_button: 7
     </rosparam>

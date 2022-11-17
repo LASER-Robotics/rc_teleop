@@ -41,7 +41,7 @@ windows:
   - easy_control:
       layout: tiled
       panes:
-        - waitForControl; waitForControl; roslaunch rc_teleop rc_teleop_logitec.launch
+        - waitForControl; waitForControl; roslaunch rc_teleop rc_teleop_txs.launch
         - waitForControl; waitForControl; roslaunch mrs_rviz_plugins rviz_interface.launch
   - layout:
       layout: tiled
