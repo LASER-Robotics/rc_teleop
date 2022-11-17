@@ -7,7 +7,7 @@ Create a [catkin workspace](http://wiki.ros.org/catkin/Tutorials/create_a_worksp
 
 ```bash
 cd $your_workspace_path/src
-git clone https://github.com/davihdsantos/rc_teleop
+git clone https://github.com/LASER-Robotics/rc_teleop.git
 ```
 
 Then, build the package with:
