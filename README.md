@@ -49,3 +49,7 @@ On the radio transmitter, configure the button SF to Channel 5. Press **SF** for
 ### Flysky
 
 On the radio transmitter, configure the button SWA to Channel 5. Press **SWA** for manual control.
+
+### Credits:
+
+This repository is build upon the code available here https://github.com/tu-darmstadt-ros-pkg/hector_quadrotor/tree/kinetic-devel/hector_quadrotor_teleop
