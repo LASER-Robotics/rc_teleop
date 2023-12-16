@@ -36,7 +36,7 @@ roslaunch rc_teleop rc_teleop_flysky.launch
 
 ## Using
 
-Wait for the drone to takeoff. The sticks are in **MODE 1** (left-vertical pitch; left-horizontal yaw; right-vertical altitude, right-horizontal roll). The control is similar to [Altitude mode](https://docs.px4.io/main/en/flight_modes/altitude_mc.html).
+Wait for the drone to takeoff. The sticks are in **MODE 1** (left-vertical pitch; left-horizontal yaw; right-vertical altitude, right-horizontal roll) by default, but it can be set to modes 2, 3 and 4 with parameter *mode*. The control is similar to [Altitude mode](https://docs.px4.io/main/en/flight_modes/altitude_mc.html).
 
 ### Logitec
 
