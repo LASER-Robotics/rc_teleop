@@ -88,6 +88,7 @@ private:
   } buttons_;
 
   double slow_factor_;
+  int _mode;
 
 public:
   TeleopTxs()
@@ -117,6 +118,8 @@ public:
     private_nh.param<int>("interrupt_button", buttons_.interrupt.button, 3);
     private_nh.param<double>("slow_factor", slow_factor_, 0.2);
 
+    private_nh.param<int>("mode", _mode, 1);
+
     joy_raw_subscriber_ = node_handle_.subscribe<sensor_msgs::Joy>("joy_raw", 1,
                                                                boost::bind(&TeleopTxs::joyRemapRCCallback, this, _1));
 
@@ -139,6 +142,33 @@ public:
     // joy_.axes[1] = -joy->axes[1];
     // joy_.axes[2] = joy->axes[2];
     // joy_.axes[3] = joy->axes[0];
+
+    switch(_mode) {
+      case 1:
+        joy_.axes[0] = getAxis(joy, axes_.yaw);
+        joy_.axes[1] = getAxis(joy, axes_.pitch);
+        joy_.axes[4] = getAxis(joy, axes_.thrust);
+        joy_.axes[3] = getAxis(joy, axes_.roll);
+        break;
+      case 2:
+        joy_.axes[0] = getAxis(joy, axes_.yaw);
+        joy_.axes[1] = getAxis(joy, axes_.pitch);
+        joy_.axes[4] = getAxis(joy, axes_.roll);
+        joy_.axes[3] = getAxis(joy, axes_.thrust);
+        break;
+      case 3:
+        joy_.axes[0] = getAxis(joy, axes_.roll);
+        joy_.axes[1] = getAxis(joy, axes_.pitch);
+        joy_.axes[4] = getAxis(joy, axes_.thrust);
+        joy_.axes[3] = getAxis(joy, axes_.yaw);
+        break;
+      case 4:
+        joy_.axes[0] = getAxis(joy, axes_.roll);
+        joy_.axes[1] = getAxis(joy, axes_.pitch);
+        joy_.axes[4] = getAxis(joy, axes_.thrust);
+        joy_.axes[3] = getAxis(joy, axes_.yaw);
+        break;
+    }
 
     joy_.axes[0] = getAxis(joy, axes_.yaw);
     joy_.axes[1] = getAxis(joy, axes_.pitch);
