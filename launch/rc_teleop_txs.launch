@@ -32,7 +32,8 @@
       yaw_max: 1.0
       yaw_offset: 0.0
 
-      go_button: 7
+      go_button: 1
+      mode: 2
     </rosparam>
 
   </node>

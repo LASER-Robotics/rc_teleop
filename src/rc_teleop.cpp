@@ -145,16 +145,16 @@ public:
 
     switch(_mode) {
       case 1:
-        joy_.axes[0] = getAxis(joy, axes_.yaw);
+        joy_.axes[0] = -getAxis(joy, axes_.thrust);
         joy_.axes[1] = getAxis(joy, axes_.pitch);
-        joy_.axes[4] = getAxis(joy, axes_.thrust);
-        joy_.axes[3] = getAxis(joy, axes_.roll);
+        joy_.axes[4] = -getAxis(joy, axes_.roll);
+        joy_.axes[3] = getAxis(joy, axes_.yaw);
         break;
       case 2:
         joy_.axes[0] = getAxis(joy, axes_.yaw);
         joy_.axes[1] = getAxis(joy, axes_.pitch);
-        joy_.axes[4] = getAxis(joy, axes_.roll);
-        joy_.axes[3] = getAxis(joy, axes_.thrust);
+        joy_.axes[4] = getAxis(joy, axes_.thrust);
+        joy_.axes[3] = getAxis(joy, axes_.roll);
         break;
       case 3:
         joy_.axes[0] = getAxis(joy, axes_.roll);
@@ -170,10 +170,10 @@ public:
         break;
     }
 
-    joy_.axes[0] = getAxis(joy, axes_.yaw);
-    joy_.axes[1] = getAxis(joy, axes_.pitch);
-    joy_.axes[4] = getAxis(joy, axes_.thrust);
-    joy_.axes[3] = getAxis(joy, axes_.roll);
+    // joy_.axes[0] = getAxis(joy, axes_.yaw);
+    // joy_.axes[1] = getAxis(joy, axes_.pitch);
+    // joy_.axes[4] = getAxis(joy, axes_.thrust);
+    // joy_.axes[3] = getAxis(joy, axes_.roll);
 
     joy_.buttons = joy->buttons;
     joy_.buttons[6] = getButton(joy, buttons_.go);
